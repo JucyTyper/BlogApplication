@@ -1,5 +1,6 @@
 ﻿using BlogApplication.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace BlogApplication.Data
 {
@@ -9,6 +10,9 @@ namespace BlogApplication.Data
         {
         }
         public DbSet<UserModel> users { get; set; }
-
+        public DbSet<BlackListTokenModel> BLTokens { get; set; }
+        public DbSet<BlogModel> Blogs { get; set; }
+        public DbSet<BlogImageModel> BlogImages { get; set; }
+        public DbSet<TagsModel> Tags { get; set; }
     }
 }

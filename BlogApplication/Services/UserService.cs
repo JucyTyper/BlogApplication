@@ -1,4 +1,5 @@
-﻿using BlogApplication.Data;
+﻿using Azure;
+using BlogApplication.Data;
 using BlogApplication.Models;
 using ChatApp.Models;
 using System.Text;
@@ -9,22 +10,46 @@ namespace BlogApplication.Services
     {
         private readonly IConfiguration configuration;
         private readonly IPasswordService passwordService;
+        private readonly IValidationService validationService;
         private readonly ITokenService tokenService;
         private readonly blogAppDatabase _db;
        // blogAppDatabase blogAppDatabase1 = new blogAppDatabase();
         UserResponse DataOut = new UserResponse();
         ResponseModel response = new ResponseModel();
-        public UserService(blogAppDatabase _db, IConfiguration configuration,IPasswordService passwordService, ITokenService tokenService)
+        public UserService(blogAppDatabase _db, IConfiguration configuration,IPasswordService passwordService, ITokenService tokenService,IValidationService validationService)
         {
             this.tokenService = tokenService;
             this._db = _db;
             this.configuration = configuration;
             this.passwordService = passwordService;
+            this.validationService = validationService;
         }
         public object RegisterUser(RegisterUserModel user)
         {
             try
             {
+                //checking if the user filled all entities 
+                if (user.dateOfBirth == DateTime.MinValue || user.email == string.Empty || user.firstName == string.Empty || user.lastName == string.Empty)
+                {
+                    response.StatusCode = 400;
+                    response.IsSuccess = false;
+                    response.Message = "Fill all details";
+                    return response;
+                }
+
+                var validation = validationService.CheckValidationPhoneNo(user.phoneNo.ToString());
+                if (validation.IsSuccess == false)
+                    return validation;
+                validation = validationService.CheckValidationEmail(user.email);
+                if (validation.IsSuccess == false)
+                    return validation;
+                validation = validationService.CheckValidationPassword(user.password);
+                if (validation.IsSuccess == false)
+                    return validation;
+                validation = validationService.CheckValidationAge(user.dateOfBirth);
+                if (validation.IsSuccess == false)
+                    return validation;
+
                 // Creating and user entity and populating it 
                 var userModel = new UserModel();
                 userModel.firstName = user.firstName;
@@ -42,10 +67,11 @@ namespace BlogApplication.Services
                 //generating Response
                 response.StatusCode = 200;
                 response.Message = "User added Successfully";
-                DataOut.Token = tokenService.CreateToken(user.email,userModel.UserId.ToString());
+                DataOut.Token = tokenService.CreateToken(user.email,userModel.UserId.ToString(),2);
                 DataOut.Name = userModel.firstName;
                 DataOut.Email = userModel.email;
                 DataOut.UserID = userModel.UserId;
+                DataOut.profilePicPath = userModel.ProfileImagePath;
                 response.Data = DataOut;
                 return response;
             }

@@ -1,8 +1,12 @@
 using BlogApplication.Data;
 using BlogApplication.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,17 +28,72 @@ builder.Services.AddSwaggerGen(options =>
     });
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme
+    ).AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes
+            (builder.Configuration.GetSection("jwt:Key").Value!)),
+            ValidateLifetime = true,
+            ValidateAudience = false,
+            ValidateIssuer = false,
+            ClockSkew = TimeSpan.Zero
+
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                if (string.IsNullOrEmpty(accessToken) == false)
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
+    });
+builder.Services.AddCors(options => options.AddPolicy(name: "CorsPolicy",
+    policy =>
+    {
+        policy.WithOrigins().AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
+    }
+    ));
+
 builder.Services.AddDbContext<blogAppDatabase>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ChatAppDatabaseConnectionString")));
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
 
+try
+{
+    string path = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
+    if (!Directory.Exists(path))
+    {
+        Directory.CreateDirectory(path);
+    }
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        //File assests = new File()
+        FileProvider = new PhysicalFileProvider(
+               Path.Combine(builder.Environment.ContentRootPath, "Assets")),
+        RequestPath = "/Assets"
+    });
+}
+catch (Exception ex)
+{
+    Console.WriteLine(ex.ToString());
+}
 // Configure the HTTP request pipeline.
-
+app.UseCors("CorsPolicy");
 app.UseSwagger();
 
 app.UseSwaggerUI();

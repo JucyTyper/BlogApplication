@@ -8,5 +8,6 @@ namespace BlogApplication.Services
         public bool VerifyPasswordHash(string password, byte[] passwordHash);
         public object changePassword(string id, ChangePasswordModel repass);
         public object ForgetPassword(ForgetPasswordModel mail);
+        public object ResetPassword(string id, ResetPasswordModel cred,string token);
     }
 }
