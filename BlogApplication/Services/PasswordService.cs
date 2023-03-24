@@ -107,7 +107,7 @@ namespace BlogApplication.Services
 
             // Get the modified link as a string
             string modifiedLink = builder.ToString();
-            string text = "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">\r\n    <tr>\r\n        <td>\r\n            <table cellspacing=\"0\" cellpadding=\"0\">\r\n                <tr>\r\n                    <td style=\"border-radius: 2px;\" bgcolor=\"#ED2939\">\r\n                        <a href=" + modifiedLink + " style=\"padding: 8px 12px; border: 1px solid #ED2939;border-radius: 2px;font-family: Helvetica, Arial, sans-serif;font-size: 14px; color: #ffffff;text-decoration: none;font-weight:bold;display: inline-block;\">\r\n                            Click Here\r\n                        </a>\r\n                    </td>\r\n                </tr>\r\n            </table>\r\n        </td>\r\n    </tr>\r\n</table>";
+            string text = "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">\r\n    <tr>\r\n        <td>\r\n            <table cellspacing=\"0\" cellpadding=\"0\">\r\n                <tr>\r\n                    <td style=\"border-radius: 2px;\" bgcolor=\"#ED2939\">\r\n                        <a href=" + modifiedLink + " style=\"padding: 8px 12px; border: 1px solid #ED2939;border-radius: 2px;font-family: Helvetica, Arial, sans-serif;font-size: 14px; color: #ffffff;text-decoration: none;font-weight:bold;display: inline-block;\">\r\n                            Verify Yourself\r\n                        </a>\r\n                    </td>\r\n                </tr>\r\n            </table>\r\n        </td>\r\n    </tr>\r\n</table>";
 
             MailMessage message = new MailMessage();
             message.IsBodyHtml = true;
@@ -117,7 +117,7 @@ namespace BlogApplication.Services
 
             // set the subject and body of the email
             message.Subject = "Verify your account";
-            message.Body = "Please verify your reset password attempt. Your one time link for verification is " + text;
+            message.Body = "Please verify your reset password attempt click on the button below " + text;
 
             // create a new SmtpClient object
             SmtpClient client = new SmtpClient();
