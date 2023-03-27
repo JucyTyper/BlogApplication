@@ -18,7 +18,7 @@ namespace BlogApplication.Controllers
             this.fileService = fileservice;
         }
         [HttpPost]
-        [Route("profileimage")]
+        [Route("image")]
         [Authorize]
         [DisableRequestSizeLimit]
         public IActionResult uploadImage([FromForm] fileUpload ImageFile)

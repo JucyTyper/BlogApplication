@@ -89,5 +89,34 @@ namespace BlogApplication.Services
             //Generating password hash and saving it
             user.password = passwordService.CreatePasswordHash(Password, salt);
         }
+        public object GetUserProfile(string id)
+        {
+            try
+            {
+                var Id = new Guid(id);
+                var user = _db.users.Where(x => x.UserId == Id).FirstOrDefault();
+                //string DOB = user.dateOfBirth.ToString("yyyy-MM-dd").Split(" ").First();
+                var userProfile = new userProfileModel
+                {
+                    Email = user.email,
+                    UserId = user.UserId,
+                    DateOfBirth = user.dateOfBirth,
+                    FirstName = user.firstName,
+                    LastName = user.lastName,
+                    PhoneNo = user.phoneNo,
+                    ProfileImagePath = user.ProfileImagePath,
+                };
+                response.Data = userProfile;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+
+        }
     }
 }

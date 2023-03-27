@@ -64,6 +64,7 @@ builder.Services.AddCors(options => options.AddPolicy(name: "CorsPolicy",
 
 builder.Services.AddDbContext<blogAppDatabase>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ChatAppDatabaseConnectionString")));
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();

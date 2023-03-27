@@ -2,6 +2,7 @@
 using BlogApplication.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BlogApplication.Controllers
 {
@@ -22,6 +23,21 @@ namespace BlogApplication.Controllers
         {
             var response = userService.RegisterUser(user);
             return Ok(response);
+        }
+        [HttpGet]
+        [Route("myProfile")]
+        public IActionResult userProfile()
+        {
+            var user = HttpContext.User;
+            var id = user.FindFirst(ClaimTypes.Sid)?.Value;
+            var response = userService.GetUserProfile(id!);
+            return Ok(response);
+        }
+        [HttpGet]
+        public IActionResult GetUser(Guid id,string email)
+        {
+            //var response = userService.GetUser(id!);
+            return Ok();
         }
     }
 }
