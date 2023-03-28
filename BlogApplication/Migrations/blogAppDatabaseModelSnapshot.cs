@@ -123,6 +123,9 @@ namespace BlogApplication.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("isAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("isDeleted")
                         .HasColumnType("bit");
 
@@ -146,6 +149,24 @@ namespace BlogApplication.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("users");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("685feb22-f5e9-4bbd-aa4a-4979364b2aab"),
+                            ProfileImagePath = "",
+                            created = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3171),
+                            dateOfBirth = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3162),
+                            email = "admin@gmail.com",
+                            firstName = "Admin",
+                            isAdmin = false,
+                            isDeleted = false,
+                            lastActive = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3172),
+                            lastName = "Admin",
+                            password = new byte[0],
+                            phoneNo = 9888636009L,
+                            updated = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3172)
+                        });
                 });
 #pragma warning restore 612, 618
         }

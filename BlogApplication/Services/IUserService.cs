@@ -6,6 +6,6 @@ namespace BlogApplication.Services
     public interface IUserService
     {
         public object RegisterUser(RegisterUserModel user);
-        public object GetUserProfile(string id);
+        public ResponseModel GetUser(Guid id, string name, string email);
     }
 }

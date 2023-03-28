@@ -9,6 +9,7 @@
         public long phoneNo { get; set; } = 0;
         public DateTime dateOfBirth { get; set; } = DateTime.MinValue;
         public string ProfileImagePath { get; set; } = string.Empty;
+        public GetUserModel() { }
         public GetUserModel(UserModel user)
         {
             this.UserId = user.UserId;

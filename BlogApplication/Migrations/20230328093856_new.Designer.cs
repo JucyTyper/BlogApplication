@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlogApplication.Migrations
 {
     [DbContext(typeof(blogAppDatabase))]
-    [Migration("20230327053643_3rd")]
-    partial class _3rd
+    [Migration("20230328093856_new")]
+    partial class @new
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -59,8 +59,15 @@ namespace BlogApplication.Migrations
                     b.Property<int>("dislikes")
                         .HasColumnType("int");
 
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("likes")
                         .HasColumnType("int");
+
+                    b.Property<string>("previewImage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("title")
                         .IsRequired()
@@ -87,9 +94,8 @@ namespace BlogApplication.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("blogId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("blogId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("TagId");
 
@@ -120,6 +126,9 @@ namespace BlogApplication.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("isAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("isDeleted")
                         .HasColumnType("bit");
 
@@ -143,6 +152,24 @@ namespace BlogApplication.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("users");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("685feb22-f5e9-4bbd-aa4a-4979364b2aab"),
+                            ProfileImagePath = "",
+                            created = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3171),
+                            dateOfBirth = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3162),
+                            email = "admin@gmail.com",
+                            firstName = "Admin",
+                            isAdmin = false,
+                            isDeleted = false,
+                            lastActive = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3172),
+                            lastName = "Admin",
+                            password = new byte[0],
+                            phoneNo = 9888636009L,
+                            updated = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3172)
+                        });
                 });
 #pragma warning restore 612, 618
         }

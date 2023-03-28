@@ -55,5 +55,12 @@ namespace BlogApplication.Controllers
             var response = blogService.GetMyBlogs(id!);
             return Ok(response);
         }
+        [HttpPost]
+        [Route("likeAndDislike")]
+        public IActionResult likeAndDislike([FromBody] LikeDislikeModel type )
+        {
+            var response = blogService.likeAndDislike(type.id,type.type);
+            return Ok(response);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using BlogApplication.Data;
 using BlogApplication.Models;
 using ChatApp.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 namespace BlogApplication.Services
@@ -89,24 +90,26 @@ namespace BlogApplication.Services
             //Generating password hash and saving it
             user.password = passwordService.CreatePasswordHash(Password, salt);
         }
-        public object GetUserProfile(string id)
+        public ResponseModel GetUser(Guid id,string searchString,string email)
         {
             try
             {
-                var Id = new Guid(id);
-                var user = _db.users.Where(x => x.UserId == Id).FirstOrDefault();
-                //string DOB = user.dateOfBirth.ToString("yyyy-MM-dd").Split(" ").First();
-                var userProfile = new userProfileModel
+                var user = _db.users.Where(x => (x.UserId == id || id == Guid.Empty) && (x.isDeleted == false) && (EF.Functions.Like(x.firstName, "%" + searchString + "%") || EF.Functions.Like(x.lastName, "%" + searchString + "%") || EF.Functions.Like(x.firstName + " " + x.lastName, "%" + searchString + "%") || searchString == null) &&
+                (x.email == email || email == null)).Select(x => x);
+                if(user.Count() == 0) 
                 {
-                    Email = user.email,
-                    UserId = user.UserId,
-                    DateOfBirth = user.dateOfBirth,
-                    FirstName = user.firstName,
-                    LastName = user.lastName,
-                    PhoneNo = user.phoneNo,
-                    ProfileImagePath = user.ProfileImagePath,
-                };
-                response.Data = userProfile;
+                    response.StatusCode = 404;
+                    response.Message = "user Not Found" ;
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var resUser = new List<GetUserModel>();
+                foreach(var item in user)
+                {
+                    var users = new GetUserModel(item);
+                    resUser.Add(users);
+                }
+                response.Data = resUser;
                 return response;
             }
             catch (Exception ex)
@@ -116,7 +119,6 @@ namespace BlogApplication.Services
                 response.IsSuccess = false;
                 return response;
             }
-
         }
     }
 }

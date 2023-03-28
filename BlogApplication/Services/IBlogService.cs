@@ -9,5 +9,6 @@ namespace BlogApplication.Services
         public ResponseModel updateBlog(Guid id, UpdateBlogModel blog);
         public ResponseModel DeleteBlog(Guid id);
         public ResponseModel GetMyBlogs(string id);
+        public ResponseModel likeAndDislike(string Id, int type);
     }
 }

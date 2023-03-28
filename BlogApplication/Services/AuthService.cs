@@ -45,12 +45,21 @@ namespace BlogApplication.Services
                 response.IsSuccess = false;
                 return response;
             }
-
             if (!passwordService.VerifyPasswordHash(user.password, _user.First().password))
             {
-                response.StatusCode = 404;
+                response.StatusCode = 400;
                 response.Message = "wrong Password";
                 response.IsSuccess = false;
+                return response;
+            }
+            if(_user.First().isAdmin== true) 
+            {
+                var AdminToken = tokenService.CreateToken(user.email, _user.First().UserId.ToString(), 3);
+                DataOut.Token = AdminToken;
+                DataOut.Name = _user.First().firstName;
+                DataOut.Email = _user.First().email;
+                DataOut.UserID = _user.First().UserId;
+                response.Data = DataOut;
                 return response;
             }
             var token = tokenService.CreateToken(user.email,_user.First().UserId.ToString(),2);

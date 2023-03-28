@@ -38,6 +38,15 @@ namespace BlogApplication.Services
                 signingCredentials: cred
                 );
             }
+            else if (type == 3)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: cred
+                );
+            }
             else
             {
                 token = new JwtSecurityToken(

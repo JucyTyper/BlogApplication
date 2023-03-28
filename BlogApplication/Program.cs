@@ -1,4 +1,5 @@
 using BlogApplication.Data;
+using BlogApplication.Hubs;
 using BlogApplication.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -55,14 +56,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme
             }
         };
     });
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
 builder.Services.AddCors(options => options.AddPolicy(name: "CorsPolicy",
     policy =>
     {
         policy.WithOrigins().AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
     }
     ));
-
-builder.Services.AddDbContext<blogAppDatabase>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ChatAppDatabaseConnectionString")));
+builder.Services.AddDbContext<blogAppDatabase>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("blogAppDatabaseConnectionString")));
+builder.Services.AddScoped<IHubService, HubService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IFileService, FileService>();
@@ -101,7 +106,13 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
+app.UseRouting();
+
 app.UseAuthorization();
+
+app.MapHub<blogHub>("/blogHub");
 
 app.MapControllers();
 

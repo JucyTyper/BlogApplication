@@ -1,4 +1,5 @@
-﻿using BlogApplication.Data;
+﻿using Azure;
+using BlogApplication.Data;
 using BlogApplication.Models;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -64,13 +65,13 @@ namespace BlogApplication.Services
             try
             {
                 var resdata = new List<GetBlogModel>();
-                List<Guid> tags = _db.Tags.Where(x => x.TagName == searchString|| searchString == string.Empty).Select(x => x.blogId).ToList();
+                List<Guid> tags = _db.Tags.Where(x => (x.TagName == searchString|| searchString == string.Empty)&&(x.isDeleted == false)).Select(x => x.blogId).ToList();
                 if (tags.Count > 0)
                 {
                     foreach (var bid in tags)
                     {
                         var tagblog = _db.Blogs.Where(x => x.blogId == bid).Select(x => x).First();
-                        var blogTag = _db.Tags.Where(x => x.blogId == bid).Select(x => x.TagName).ToList();
+                        var blogTag = _db.Tags.Where(x => x.blogId == bid && x.isDeleted == false).Select(x => x.TagName).ToList();
                         var creator = _db.users.Where(x => x.UserId == tagblog.createrId).Select(x => x).First();
                         var getBlog = new GetBlogModel
                         {
@@ -84,7 +85,7 @@ namespace BlogApplication.Services
                 var titleBlog = _db.Blogs.Where(x => (x.blogId == id || id == Guid.Empty) && (x.isDeleted == false) && ((EF.Functions.Like(x.title, "%" + searchString + "%") || searchString == string.Empty))).Select(x => x).OrderByDescending(x => x.createdAt).ToList();
                 foreach (var blog in titleBlog)
                 {
-                    var blogTag = _db.Tags.Where(x => x.blogId == blog.blogId).Select(x => x.TagName).ToList();
+                    var blogTag = _db.Tags.Where(x => x.blogId == blog.blogId && x.isDeleted == false).Select(x => x.TagName).ToList();
                     var creator = _db.users.Where(x => x.UserId == blog.createrId).Select(x => x).First();
                     var getBlog = new GetBlogModel
                     {
@@ -118,6 +119,20 @@ namespace BlogApplication.Services
                     _blog!.content = blog.content;
                 if (blog.previewImage != string.Empty)
                     _blog!.previewImage = blog.previewImage;
+                if (blog.tags.Count != 0)
+                    foreach (var t in blog.tags)
+                    {
+                        var tags = _db.Tags.Where(x=>x.blogId == id && x.isDeleted == false && x.TagName == t.tagName).ToList();
+                        if(tags.Count == 0)
+                        {
+                            var tagEntity = new TagsModel
+                            {
+                                TagName = t.tagName,
+                                blogId = id
+                            };
+                            _db.Tags.Add(tagEntity);
+                        }
+                    }
                 _blog!.updatedAt = DateTime.Now;
                 _db.SaveChanges();
                 response.Message = "Blog updated successfully";
@@ -157,7 +172,7 @@ namespace BlogApplication.Services
             {
                 var id = new Guid(Id);
                 var resdata = new List<GetBlogModel>();
-                var _blog = _db.Blogs.Where(x => x.createrId == id).Select(x=>x).ToList();
+                var _blog = _db.Blogs.Where(x => x.createrId == id && x.isDeleted == false).Select(x=>x).ToList();
                 var creator = _db.users.Where(x => x.UserId == id).Select(x => x).First();
                 foreach (var blog in _blog)
                 {
@@ -179,6 +194,32 @@ namespace BlogApplication.Services
             {
                 response.StatusCode = 500;
                 response.Message = ex.Message!;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+        public ResponseModel likeAndDislike(string Id, int type)
+        {
+            try
+            {
+                var blog = _db.Blogs.Where(x => x.blogId == new Guid(Id)).FirstOrDefault();
+                if (type == 1)
+                {
+                    blog!.likes = blog.likes + 1;
+                    response.Data = blog.likes;
+                }
+                else if (type == 2)
+                {
+                    blog!.dislikes = blog.dislikes + 1;
+                    response.Data = blog.dislikes;
+                }
+                response.Message = "like and dislike status updated";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
                 response.IsSuccess = false;
                 return response;
             }

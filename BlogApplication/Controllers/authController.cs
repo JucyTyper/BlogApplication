@@ -30,7 +30,7 @@ namespace BlogApplication.Controllers
             var response = AuthService.GoogleAuth(token.token);
             return Ok(response);
         }
-        [HttpPost]
+        [HttpDelete]
         [Authorize]
         [Route("logout")]
         public IActionResult LogOut()
