@@ -4,6 +4,7 @@ using BlogApplication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlogApplication.Migrations
 {
     [DbContext(typeof(blogAppDatabase))]
-    partial class blogAppDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20230329112057_29marchFinal")]
+    partial class _29marchFinal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,19 +176,19 @@ namespace BlogApplication.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = new Guid("4c0eb5ed-ab44-4008-9683-e57333636085"),
+                            UserId = new Guid("037c55b4-1681-4c59-95b9-4028b49e4b55"),
                             ProfileImagePath = "",
-                            created = new DateTime(2023, 3, 29, 17, 27, 8, 94, DateTimeKind.Local).AddTicks(9461),
-                            dateOfBirth = new DateTime(2023, 3, 29, 17, 27, 8, 94, DateTimeKind.Local).AddTicks(9453),
+                            created = new DateTime(2023, 3, 29, 16, 50, 57, 409, DateTimeKind.Local).AddTicks(7783),
+                            dateOfBirth = new DateTime(2023, 3, 29, 16, 50, 57, 409, DateTimeKind.Local).AddTicks(7775),
                             email = "admin@gmail.com",
                             firstName = "Admin",
                             isAdmin = true,
                             isDeleted = false,
-                            lastActive = new DateTime(2023, 3, 29, 17, 27, 8, 94, DateTimeKind.Local).AddTicks(9462),
+                            lastActive = new DateTime(2023, 3, 29, 16, 50, 57, 409, DateTimeKind.Local).AddTicks(7784),
                             lastName = "Admin",
                             password = new byte[] { 48, 56, 57, 55, 50, 51, 52, 48, 54, 50, 66, 67, 70, 48, 68, 68, 52, 65, 68, 48, 68, 66, 49, 48, 52, 54, 56, 54, 48, 65, 49, 48, 51, 57, 53, 51, 70, 50, 68, 65, 56, 54, 68, 49, 49, 50, 65, 56, 54, 48, 70, 69, 52, 66, 51, 50, 70, 57, 57, 56, 50, 52, 57, 56, 57, 65, 69, 66, 67, 48, 51, 53, 55, 54, 68, 55, 65, 55, 50, 51, 57, 55, 66, 68, 66, 52, 55, 53, 56, 53, 49, 54, 65, 54, 48, 50, 69, 65, 48, 67, 54, 57, 49, 65, 67, 68, 51, 50, 55, 69, 56, 54, 70, 52, 68, 67, 48, 66, 49, 50, 65, 56, 65, 55, 56, 68, 57, 48 },
                             phoneNo = 9888636009L,
-                            updated = new DateTime(2023, 3, 29, 17, 27, 8, 94, DateTimeKind.Local).AddTicks(9462)
+                            updated = new DateTime(2023, 3, 29, 16, 50, 57, 409, DateTimeKind.Local).AddTicks(7784)
                         });
                 });
 #pragma warning restore 612, 618

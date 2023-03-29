@@ -7,17 +7,17 @@ using System.Text;
 
 namespace BlogApplication.Services
 {
-    public class UserService:IUserService
+    public class UserService : IUserService
     {
         private readonly IConfiguration configuration;
         private readonly IPasswordService passwordService;
         private readonly IValidationService validationService;
         private readonly ITokenService tokenService;
         private readonly blogAppDatabase _db;
-       // blogAppDatabase blogAppDatabase1 = new blogAppDatabase();
+        // blogAppDatabase blogAppDatabase1 = new blogAppDatabase();
         UserResponse DataOut = new UserResponse();
         ResponseModel response = new ResponseModel();
-        public UserService(blogAppDatabase _db, IConfiguration configuration,IPasswordService passwordService, ITokenService tokenService,IValidationService validationService)
+        public UserService(blogAppDatabase _db, IConfiguration configuration, IPasswordService passwordService, ITokenService tokenService, IValidationService validationService)
         {
             this.tokenService = tokenService;
             this._db = _db;
@@ -37,7 +37,6 @@ namespace BlogApplication.Services
                     response.Message = "Fill all details";
                     return response;
                 }
-
                 var validation = validationService.CheckValidationPhoneNo(user.phoneNo.ToString());
                 if (validation.IsSuccess == false)
                     return validation;
@@ -68,10 +67,11 @@ namespace BlogApplication.Services
                 //generating Response
                 response.StatusCode = 200;
                 response.Message = "User added Successfully";
-                DataOut.Token = tokenService.CreateToken(user.email,userModel.UserId.ToString(),2);
+                DataOut.Token = tokenService.CreateToken(user.email, userModel.UserId.ToString(), 2);
                 DataOut.Name = userModel.firstName;
                 DataOut.Email = userModel.email;
                 DataOut.UserID = userModel.UserId;
+                DataOut.isAdmin= userModel.isAdmin;
                 DataOut.profilePicPath = userModel.ProfileImagePath;
                 response.Data = DataOut;
                 return response;
@@ -90,21 +90,21 @@ namespace BlogApplication.Services
             //Generating password hash and saving it
             user.password = passwordService.CreatePasswordHash(Password, salt);
         }
-        public ResponseModel GetUser(Guid id,string searchString,string email)
+        public ResponseModel GetUser(Guid id, string searchString, string email, int pageNo)
         {
             try
             {
                 var user = _db.users.Where(x => (x.UserId == id || id == Guid.Empty) && (x.isDeleted == false) && (EF.Functions.Like(x.firstName, "%" + searchString + "%") || EF.Functions.Like(x.lastName, "%" + searchString + "%") || EF.Functions.Like(x.firstName + " " + x.lastName, "%" + searchString + "%") || searchString == null) &&
-                (x.email == email || email == null)).Select(x => x);
-                if(user.Count() == 0) 
+                (x.email == email || email == null)).Select(x => x).Skip((pageNo - 1)*5).Take(5);
+                if (user.Count() == 0)
                 {
                     response.StatusCode = 404;
-                    response.Message = "user Not Found" ;
+                    response.Message = "user Not Found";
                     response.IsSuccess = false;
                     return response;
                 }
                 var resUser = new List<GetUserModel>();
-                foreach(var item in user)
+                foreach (var item in user)
                 {
                     var users = new GetUserModel(item);
                     resUser.Add(users);
@@ -120,5 +120,36 @@ namespace BlogApplication.Services
                 return response;
             }
         }
+        public ResponseModel UpdateUser(Guid id, UpdateUserModel _user)
+        {
+            try
+            {
+                var user = _db.users.Where(x => (x.UserId == id || id == Guid.Empty) && (x.isDeleted == false)).Select(x => x).ToList();
+                if (user.Count() == 0)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "user Not Found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                user.First().firstName = _user.firstName;
+                user.First().lastName = _user.lastName;
+                user.First().dateOfBirth = _user.dateOfBirth;
+                user.First().phoneNo = _user.phoneNo;
+
+                var users = new GetUserModel(user.First());
+                response.Data = users;
+                return response;
+            }
+
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
     }
 }

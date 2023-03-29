@@ -9,6 +9,7 @@
         public long phoneNo { get; set; } = 0;
         public DateTime dateOfBirth { get; set; } = DateTime.MinValue;
         public string ProfileImagePath { get; set; } = string.Empty;
+        public bool isAdmin { get; set; } = false;
         public GetUserModel() { }
         public GetUserModel(UserModel user)
         {
@@ -19,6 +20,7 @@
             this.lastName = user.lastName;
             this.dateOfBirth = user.dateOfBirth;
             this.ProfileImagePath= user.ProfileImagePath;
+            this.isAdmin = user.isAdmin;
         }
     }
 }

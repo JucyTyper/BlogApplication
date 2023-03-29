@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BlogApplication.Migrations
 {
     /// <inheritdoc />
-    public partial class @new : Migration
+    public partial class _29marchFinal : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,6 +33,20 @@ namespace BlogApplication.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "blogTagMaps",
+                columns: table => new
+                {
+                    mapId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    tagId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    blogId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    isDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_blogTagMaps", x => x.mapId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BLTokens",
                 columns: table => new
                 {
@@ -50,7 +64,7 @@ namespace BlogApplication.Migrations
                 {
                     TagId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TagName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    blogId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    isDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -83,7 +97,7 @@ namespace BlogApplication.Migrations
             migrationBuilder.InsertData(
                 table: "users",
                 columns: new[] { "UserId", "ProfileImagePath", "created", "dateOfBirth", "email", "firstName", "isAdmin", "isDeleted", "lastActive", "lastName", "password", "phoneNo", "updated" },
-                values: new object[] { new Guid("685feb22-f5e9-4bbd-aa4a-4979364b2aab"), "", new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3171), new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3162), "admin@gmail.com", "Admin", false, false, new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3172), "Admin", new byte[0], 9888636009L, new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3172) });
+                values: new object[] { new Guid("037c55b4-1681-4c59-95b9-4028b49e4b55"), "", new DateTime(2023, 3, 29, 16, 50, 57, 409, DateTimeKind.Local).AddTicks(7783), new DateTime(2023, 3, 29, 16, 50, 57, 409, DateTimeKind.Local).AddTicks(7775), "admin@gmail.com", "Admin", true, false, new DateTime(2023, 3, 29, 16, 50, 57, 409, DateTimeKind.Local).AddTicks(7784), "Admin", new byte[] { 48, 56, 57, 55, 50, 51, 52, 48, 54, 50, 66, 67, 70, 48, 68, 68, 52, 65, 68, 48, 68, 66, 49, 48, 52, 54, 56, 54, 48, 65, 49, 48, 51, 57, 53, 51, 70, 50, 68, 65, 56, 54, 68, 49, 49, 50, 65, 56, 54, 48, 70, 69, 52, 66, 51, 50, 70, 57, 57, 56, 50, 52, 57, 56, 57, 65, 69, 66, 67, 48, 51, 53, 55, 54, 68, 55, 65, 55, 50, 51, 57, 55, 66, 68, 66, 52, 55, 53, 56, 53, 49, 54, 65, 54, 48, 50, 69, 65, 48, 67, 54, 57, 49, 65, 67, 68, 51, 50, 55, 69, 56, 54, 70, 52, 68, 67, 48, 66, 49, 50, 65, 56, 65, 55, 56, 68, 57, 48 }, 9888636009L, new DateTime(2023, 3, 29, 16, 50, 57, 409, DateTimeKind.Local).AddTicks(7784) });
         }
 
         /// <inheritdoc />
@@ -91,6 +105,9 @@ namespace BlogApplication.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Blogs");
+
+            migrationBuilder.DropTable(
+                name: "blogTagMaps");
 
             migrationBuilder.DropTable(
                 name: "BLTokens");

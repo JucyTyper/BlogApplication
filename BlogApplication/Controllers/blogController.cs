@@ -28,9 +28,9 @@ namespace BlogApplication.Controllers
             return Ok(response);
         }
         [HttpGet]
-        public IActionResult GetBlog(Guid id, string? searchString)
+        public IActionResult GetBlog(Guid id, string? searchString, Guid createrId)
         {
-            var response = blogService.GetBlogs(id, searchString!);
+            var response = blogService.GetBlogs(id, searchString!,createrId);
             return Ok(response);
         }
         [HttpPut]
@@ -57,9 +57,23 @@ namespace BlogApplication.Controllers
         }
         [HttpPost]
         [Route("likeAndDislike")]
-        public IActionResult likeAndDislike([FromBody] LikeDislikeModel type )
+        public IActionResult likeAndDislike([FromBody] LikeDislikeModel type)
         {
-            var response = blogService.likeAndDislike(type.id,type.type);
+            var response = blogService.likeAndDislike(type.id, type.type);
+            return Ok(response);
+        }
+        [HttpGet]
+        [Route("famousTags")]
+        public IActionResult GetFamousTags()
+        {
+            var response = blogService.GetFamousTags();
+            return Ok(response);
+        }
+        [HttpGet]
+        [Route("randomBlogs")]
+        public IActionResult RandomBlogs()
+        {
+            var response = blogService.RecommendedBlogs();
             return Ok(response);
         }
     }

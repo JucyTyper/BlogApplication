@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlogApplication.Migrations
 {
     [DbContext(typeof(blogAppDatabase))]
-    [Migration("20230328093856_new")]
-    partial class @new
+    [Migration("20230329115708_29marchFinal1")]
+    partial class _29marchFinal1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,6 +84,26 @@ namespace BlogApplication.Migrations
                     b.ToTable("Blogs");
                 });
 
+            modelBuilder.Entity("BlogApplication.Models.BlogTagMap", b =>
+                {
+                    b.Property<Guid>("mapId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("blogId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("tagId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("mapId");
+
+                    b.ToTable("blogTagMaps");
+                });
+
             modelBuilder.Entity("BlogApplication.Models.TagsModel", b =>
                 {
                     b.Property<Guid>("TagId")
@@ -94,8 +114,8 @@ namespace BlogApplication.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("blogId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
 
                     b.HasKey("TagId");
 
@@ -156,19 +176,19 @@ namespace BlogApplication.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = new Guid("685feb22-f5e9-4bbd-aa4a-4979364b2aab"),
+                            UserId = new Guid("4c0eb5ed-ab44-4008-9683-e57333636085"),
                             ProfileImagePath = "",
-                            created = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3171),
-                            dateOfBirth = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3162),
+                            created = new DateTime(2023, 3, 29, 17, 27, 8, 94, DateTimeKind.Local).AddTicks(9461),
+                            dateOfBirth = new DateTime(2023, 3, 29, 17, 27, 8, 94, DateTimeKind.Local).AddTicks(9453),
                             email = "admin@gmail.com",
                             firstName = "Admin",
-                            isAdmin = false,
+                            isAdmin = true,
                             isDeleted = false,
-                            lastActive = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3172),
+                            lastActive = new DateTime(2023, 3, 29, 17, 27, 8, 94, DateTimeKind.Local).AddTicks(9462),
                             lastName = "Admin",
-                            password = new byte[0],
+                            password = new byte[] { 48, 56, 57, 55, 50, 51, 52, 48, 54, 50, 66, 67, 70, 48, 68, 68, 52, 65, 68, 48, 68, 66, 49, 48, 52, 54, 56, 54, 48, 65, 49, 48, 51, 57, 53, 51, 70, 50, 68, 65, 56, 54, 68, 49, 49, 50, 65, 56, 54, 48, 70, 69, 52, 66, 51, 50, 70, 57, 57, 56, 50, 52, 57, 56, 57, 65, 69, 66, 67, 48, 51, 53, 55, 54, 68, 55, 65, 55, 50, 51, 57, 55, 66, 68, 66, 52, 55, 53, 56, 53, 49, 54, 65, 54, 48, 50, 69, 65, 48, 67, 54, 57, 49, 65, 67, 68, 51, 50, 55, 69, 56, 54, 70, 52, 68, 67, 48, 66, 49, 50, 65, 56, 65, 55, 56, 68, 57, 48 },
                             phoneNo = 9888636009L,
-                            updated = new DateTime(2023, 3, 28, 15, 8, 56, 343, DateTimeKind.Local).AddTicks(3172)
+                            updated = new DateTime(2023, 3, 29, 17, 27, 8, 94, DateTimeKind.Local).AddTicks(9462)
                         });
                 });
 #pragma warning restore 612, 618

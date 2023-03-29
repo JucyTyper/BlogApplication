@@ -1,13 +1,10 @@
-﻿using Azure;
+﻿
 using BlogApplication.Data;
 using BlogApplication.Models;
-using System.Configuration;
 using System.Net.Mail;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 using System.Data;
 using ChatApp.Models;
 
@@ -33,6 +30,7 @@ namespace BlogApplication.Services
         {
             var hmac = new HMACSHA512(salt);
             var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            Console.WriteLine(passwordHash.ToString());
             return passwordHash;
         }
         public bool VerifyPasswordHash(string password, byte[] passwordHash)
@@ -43,6 +41,13 @@ namespace BlogApplication.Services
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
+        }
+        public byte[] RegisterAdminPassword( string Password)
+        {
+            byte[] salt = Encoding.ASCII.GetBytes(configuration.GetSection("Password:salt").Value!);
+            //Generating password hash and saving it
+            var password = CreatePasswordHash(Password, salt);
+            return password;
         }
         public object changePassword(string id, ChangePasswordModel repass)
         {
@@ -113,7 +118,7 @@ namespace BlogApplication.Services
             message.IsBodyHtml = true;
             // set the sender and recipient email addresses
             message.From = new MailAddress("ajay.joshi@chatapp.chicmic.co.in");
-            message.To.Add(new MailAddress(mail.email));
+            message.To.Add(new MailAddress("joshi2312002@gmail.com"));
 
             // set the subject and body of the email
             message.Subject = "Verify your account";

@@ -32,13 +32,19 @@ namespace BlogApplication.Controllers
         {
             var user = HttpContext.User;
             var id = user.FindFirst(ClaimTypes.Sid)?.Value;
-            var response = userService.GetUser(new Guid(id!),null!,null!);
+            var response = userService.GetUser(new Guid(id!),null!,null!,1);
             return Ok(response);
         }
         [HttpGet]
-        public IActionResult GetUser(Guid id,string? email,string? name)
+        public IActionResult GetUser(Guid id,string? email,string? name,int pageNo)
         {
-            var response = userService.GetUser(id,name!,email!);
+            var response = userService.GetUser(id,name!,email!,pageNo);
+            return Ok(response);
+        }
+        [HttpPut]
+        public IActionResult UpdateUser(Guid id, [FromBody] UpdateUserModel user)
+        {
+            var response = userService.UpdateUser(id, user);
             return Ok(response);
         }
     }
