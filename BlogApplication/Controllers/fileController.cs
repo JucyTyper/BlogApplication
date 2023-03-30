@@ -1,4 +1,5 @@
-﻿using BlogApplication.Services;
+﻿using Azure;
+using BlogApplication.Services;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -25,8 +26,8 @@ namespace BlogApplication.Controllers
         {
             var user1 = HttpContext.User;
             var id = user1.FindFirst(ClaimTypes.Sid)?.Value;
-            var message = fileService.UploadImage(id!, ImageFile);
-            return Ok(message);
+            var response = fileService.UploadImage(id!, ImageFile);
+            return StatusCode(response.statusCode, response);
         }
     }
 }

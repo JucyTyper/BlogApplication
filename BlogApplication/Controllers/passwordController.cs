@@ -1,9 +1,7 @@
 ﻿using BlogApplication.Models;
 using BlogApplication.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 using System.Security.Claims;
 
 namespace BlogApplication.Controllers
@@ -25,7 +23,7 @@ namespace BlogApplication.Controllers
         public IActionResult ForgetPasssword(ForgetPasswordModel mail)
         {
             var response = passwordService.ForgetPassword(mail);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpPut]
@@ -35,31 +33,26 @@ namespace BlogApplication.Controllers
         {
             string token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             var temp = tokenService.CheckToken(token);
-            if (temp.IsSuccess == false)
+            if (temp.isSuccess == false)
                 return Ok(temp);
             var user = HttpContext.User;
             var userId = user.FindFirst(ClaimTypes.Sid)?.Value;
             var response = passwordService.changePassword(userId!, repass);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
         [HttpPut]
-        [Authorize]
+        [Authorize(Roles = "ForgetPassword")]
         [Route("resetPassword")]
         public IActionResult ResetPassword(ResetPasswordModel repass)
         {
             string token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             var temp = tokenService.CheckToken(token);
-            if (temp.IsSuccess == false)
+            if (temp.isSuccess == false)
                 return Ok(temp);
             var user = HttpContext.User;
             var id = user.FindFirst(ClaimTypes.Sid)?.Value;
-            var test = id!.Split("xtxtx").Last();
-            if(test != "Brush")
-            {
-                return BadRequest();
-            }
             var response = passwordService.ResetPassword(id!, repass,token);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
     }
 }

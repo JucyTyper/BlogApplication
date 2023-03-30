@@ -7,47 +7,55 @@ namespace BlogApplication.Services
 {
     public class HubService :IHubService
     {
-        private readonly IConfiguration configuration;
-        private readonly IPasswordService passwordService;
-        private readonly IValidationService validationService;
-        private readonly ITokenService tokenService;
         private readonly blogAppDatabase _db;
-        // blogAppDatabase blogAppDatabase1 = new blogAppDatabase();
-        UserResponse DataOut = new UserResponse();
-        ResponseModel response = new ResponseModel();
-        public HubService(blogAppDatabase _db, IConfiguration configuration, IPasswordService passwordService, ITokenService tokenService, IValidationService validationService)
+        public HubService(blogAppDatabase _db)
         {
-            this.tokenService = tokenService;
             this._db = _db;
-            this.configuration = configuration;
-            this.passwordService = passwordService;
-            this.validationService = validationService;
         }
+        // ------------------- A Function to Like and Dislike blogs ------->>
         public ResponseModel likeAndDistlike(string Id,int type)
         {
             try
             {
+                //Fething blog
                 var blog = _db.Blogs.Where(x => x.blogId == new Guid(Id)).FirstOrDefault();
                 if (type == 1)
                 {
+                    // Increasing Like
                     blog!.likes = blog.likes + 1;
-                    response.Data = blog.likes;
+                    _db.SaveChanges();
+                    return new ResponseModel(blog.likes);
                 }
-                else if (type == 2)
+                else
                 {
+                    // Increasing Dislike
                     blog!.dislikes = blog.dislikes + 1;
-                    response.Data = blog.dislikes;
+                    _db.SaveChanges();
+                    return new ResponseModel(blog.dislikes);
                 }
-                _db.SaveChanges();
-                response.Message = "like and dislike status updated";
-                return response;
             }
             catch (Exception ex)
             {
-                response.StatusCode = 500;
-                response.Message = ex.Message;
-                response.IsSuccess = false;
-                return response;
+                return new ResponseModel(500, ex.Message, false);
+            }
+        }
+        //---------- A Function to get active notices ---------->>
+        public ResponseModel GetNotice()
+        {
+            try
+            {
+                //Fetching notices
+                var Notices = _db.notices.Where(x => x.CreationTime.AddDays(1) > DateTime.Now  && x.isDeleted == false).Select(x => x).ToList();
+                //Checking if notices exist
+                if (Notices.Count() == 0)
+                {
+                    return new ResponseModel(404, "Notice Not found", false);
+                }
+                return new ResponseModel("Active Notice",Notices);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel(500, ex.Message, false);
             }
         }
     }

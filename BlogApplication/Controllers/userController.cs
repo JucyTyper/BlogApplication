@@ -23,7 +23,7 @@ namespace BlogApplication.Controllers
         public IActionResult RegisterUser(RegisterUserModel user)
         {
             var response = userService.RegisterUser(user);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
         [HttpGet]
         [Authorize]
@@ -33,19 +33,44 @@ namespace BlogApplication.Controllers
             var user = HttpContext.User;
             var id = user.FindFirst(ClaimTypes.Sid)?.Value;
             var response = userService.GetUser(new Guid(id!),null!,null!,1);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetUser(Guid id,string? email,string? name,int pageNo)
         {
             var response = userService.GetUser(id,name!,email!,pageNo);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
         [HttpPut]
         public IActionResult UpdateUser(Guid id, [FromBody] UpdateUserModel user)
         {
             var response = userService.UpdateUser(id, user);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
+        }
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [Route("addNotice")]
+        public IActionResult addNotice(AddNotice Data)
+        {
+            var response = userService.AddNotice(Data.noticeData);
+            return StatusCode(response.statusCode, response);
+        }
+        [HttpDelete]
+        [Authorize(Roles = "Admin")]
+        [Route("removeNotice")]
+        public IActionResult removeNotice(Guid Id)
+        {
+            var response = userService.RemoveNotice(Id);
+            return StatusCode(response.statusCode, response);
+        }
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        [Route("GetNotice")]
+        public IActionResult getNotice()
+        {
+            var response = userService.GetNotice();
+            return StatusCode(response.statusCode, response);
         }
     }
 }

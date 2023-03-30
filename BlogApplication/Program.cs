@@ -111,8 +111,12 @@ app.UseAuthentication();
 app.UseRouting();
 
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<blogHub>("/blogHub");
+});
 
-app.MapHub<blogHub>("/blogHub");
+//app.MapHub<blogHub>("/blogHub");
 
 app.MapControllers();
 

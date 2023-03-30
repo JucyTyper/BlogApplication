@@ -1,9 +1,10 @@
-﻿using ChatApp.Models;
+﻿using BlogApplication.Models;
+using ChatApp.Models;
 
 namespace BlogApplication.Services
 {
     public interface IFileService
     {
-        public object UploadImage(string id, fileUpload imageFile);
+        public ResponseModel UploadImage(string id, fileUpload imageFile);
     }
 }

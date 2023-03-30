@@ -25,25 +25,25 @@ namespace BlogApplication.Controllers
             var user1 = HttpContext.User;
             var id = user1.FindFirst(ClaimTypes.Sid)?.Value;
             var response = blogService.CreateBlog(id!,blog);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
         [HttpGet]
-        public IActionResult GetBlog(Guid id, string? searchString, Guid createrId)
+        public IActionResult GetBlog(Guid id, string? searchString)
         {
-            var response = blogService.GetBlogs(id, searchString!,createrId);
-            return Ok(response);
+            var response = blogService.GetBlogs(id, searchString!);
+            return StatusCode(response.statusCode, response);
         }
         [HttpPut]
         public IActionResult UpdateBlog(Guid id, [FromBody] UpdateBlogModel blog)
         {
             var response = blogService.updateBlog(id,blog);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
         [HttpDelete]
         public IActionResult DeteteBlog(Guid id)
         {
             var response = blogService.DeleteBlog(id);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
         [HttpGet]
         [Route("myBlogs")]
@@ -53,28 +53,29 @@ namespace BlogApplication.Controllers
             var user1 = HttpContext.User;
             var id = user1.FindFirst(ClaimTypes.Sid)?.Value;
             var response = blogService.GetMyBlogs(id!);
-            return Ok(response);
-        }
-        [HttpPost]
-        [Route("likeAndDislike")]
-        public IActionResult likeAndDislike([FromBody] LikeDislikeModel type)
-        {
-            var response = blogService.likeAndDislike(type.id, type.type);
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
         [HttpGet]
         [Route("famousTags")]
         public IActionResult GetFamousTags()
         {
             var response = blogService.GetFamousTags();
-            return Ok(response);
+            return StatusCode(response.statusCode, response);
         }
         [HttpGet]
         [Route("randomBlogs")]
         public IActionResult RandomBlogs()
         {
             var response = blogService.RecommendedBlogs();
-            return Ok(response);
+            return StatusCode(response.statusCode,response);
+        }
+        [HttpGet]
+        [Route("userBlogs")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult userBlog(Guid id)
+        {
+            var response = blogService.GetMyBlogs(id.ToString()!);
+            return StatusCode(response.statusCode, response);
         }
     }
 }

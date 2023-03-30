@@ -30,5 +30,6 @@ namespace BlogApplication.Data
         public DbSet<BlogModel> Blogs { get; set; }
         public DbSet<TagsModel> Tags { get; set; }
         public DbSet<BlogTagMap> blogTagMaps { get; set; }
+        public DbSet<NoticeModel> notices { get; set; }
     }
 }

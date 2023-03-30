@@ -1,5 +1,4 @@
-﻿
-using BlogApplication.Data;
+﻿using BlogApplication.Data;
 using BlogApplication.Models;
 using System.Net.Mail;
 using System.Net;
@@ -16,8 +15,9 @@ namespace BlogApplication.Services
         private readonly blogAppDatabase _db;
         private readonly IConfiguration configuration;
         private readonly IValidationService validationService;
-        ResponseModel response = new ResponseModel();
         UserResponse DataOut = new UserResponse();
+        
+        // Calling Constructor
         public PasswordService(IConfiguration configuration,blogAppDatabase _db,ITokenService tokenService, IValidationService validationService)
         {
             this.tokenService = tokenService;
@@ -25,82 +25,72 @@ namespace BlogApplication.Services
             this.configuration = configuration;
             this.validationService = validationService;
         }
-        //A function to generate passwordHash
+        //---------------A function to generate passwordHash------------->>
         public byte[] CreatePasswordHash(string password, byte[] salt)
         {
             var hmac = new HMACSHA512(salt);
+            //creatinh password Hash
             var passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            Console.WriteLine(passwordHash.ToString());
             return passwordHash;
         }
+        //----------------A Function to verify hash password ------------->>
         public bool VerifyPasswordHash(string password, byte[] passwordHash)
         {
+            //Getting salt
             byte[] salt = Encoding.ASCII.GetBytes(configuration.GetSection("Password:salt").Value!);
             using (var hmac = new HMACSHA512(salt))
             {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
         }
-        public byte[] RegisterAdminPassword( string Password)
-        {
-            byte[] salt = Encoding.ASCII.GetBytes(configuration.GetSection("Password:salt").Value!);
-            //Generating password hash and saving it
-            var password = CreatePasswordHash(Password, salt);
-            return password;
-        }
-        public object changePassword(string id, ChangePasswordModel repass)
+        //----------------A Function to Change Password------------>>
+        public ResponseModel changePassword(string id, ChangePasswordModel repass)
         {
             try
             {
+                //Checking Validity of the password
                 var validation = validationService.CheckValidationPassword(repass.newPassword);
-                if (validation.IsSuccess == false)
+                if (validation.isSuccess == false)
                     return validation;
+
                 Guid Id = new Guid(id);
+                //Getting user data
                 var _user = _db.users.Where(x =>
                  (x.UserId == Id)).Select(x => x);
                 if (_user.Count() == 0)
                 {
-                    response.StatusCode = 404;
-                    response.Message = "User Not Found";
-                    response.IsSuccess = false;
-                    return response;
+                    return new ResponseModel(404, "User NotFound", false);
                 }
+                //Verifying password
                 if (!VerifyPasswordHash(repass.oldPassword, _user.First().password))
                 {
-                    response.StatusCode = 400;
-                    response.Message = "wrong Old Password";
-                    response.IsSuccess = false;
-                    return response;
+                    return new ResponseModel(400, "Wrong Old Password", false);
                 }
+
                 byte[] salt = Encoding.ASCII.GetBytes(configuration.GetSection("Password:salt").Value!);
                 //Generating password hash and saving it
                 _user.First().password = CreatePasswordHash(repass.newPassword, salt);
+                // Saving Password
                 _db.SaveChanges();
-                response.IsSuccess = true;
-                response.StatusCode = 200;
-                response.Message = "password Changed";
-                return response;
+
+                return new ResponseModel("Password Changed");
             }
             catch (Exception ex)
             {
-                response.StatusCode = 500;
-                response.Message = ex.Message;
-                response.IsSuccess = false;
-                return response;
+                return new ResponseModel(500, ex.Message, false);
             }
         }
-        public object ForgetPassword(ForgetPasswordModel mail)
+        //------------------ A Function for forget password ------------->>
+        public ResponseModel ForgetPassword(ForgetPasswordModel mail)
         {
+            //Checking Email
             var _user = _db.users.Where(x => x.email == mail.email).Select(x => x);
             if (_user.Count() == 0)
             {
-                response.StatusCode = 404;
-                response.Message = "Email Not Found";
-                response.IsSuccess = false;
-                return response;
+                return new ResponseModel(404, "Email Not Found", false);
             }
-            string token = tokenService.CreateToken(mail.email,_user.First().UserId.ToString()+"xtxtxBrush", 1);
+            string token = tokenService.CreateToken(mail.email,_user.First().UserId.ToString(), 1);
             // Create a new UriBuilder object with the original link
             UriBuilder builder = new UriBuilder("http://localhost:4200/redirect");
 
@@ -117,12 +107,12 @@ namespace BlogApplication.Services
             MailMessage message = new MailMessage();
             message.IsBodyHtml = true;
             // set the sender and recipient email addresses
-            message.From = new MailAddress("ajay.joshi@chatapp.chicmic.co.in");
-            message.To.Add(new MailAddress("joshi2312002@gmail.com"));
+            message.From = new MailAddress("Verification.mail@blogapp.chicmic.co.in");
+            message.To.Add(new MailAddress(mail.email));
 
             // set the subject and body of the email
             message.Subject = "Verify your account";
-            message.Body = "Please verify your reset password attempt click on the button below " + text;
+            message.Body = "To verify your reset password attempt click on the button below " + text;
 
             // create a new SmtpClient object
             SmtpClient client = new SmtpClient();
@@ -138,51 +128,39 @@ namespace BlogApplication.Services
             // send the email
             client.Send(message);
 
-            response.StatusCode = 200;
-            response.Message = "Verification Email Sent";
-            response.IsSuccess = true;
-            return response;
+            return new ResponseModel("Verification Email Sent");
         }
-        public object ResetPassword(string userid, ResetPasswordModel cred,string token)
+        //-------------------- A Function To reset Password ---------------->>
+        public ResponseModel ResetPassword(string userid, ResetPasswordModel cred,string token)
         {
             try
             {
-                var id = userid.Split("xtxtx").First();
-                Console.WriteLine(id);
+                //Checking password pattern
                 var validation = validationService.CheckValidationPassword(cred.newPassword);
-                if (validation.IsSuccess == false)
+                if (validation.isSuccess == false)
                     return validation;
-                Guid Id = new Guid(id);
+
+                Guid Id = new Guid(userid);
+                //fetching user Data
                 var _user = _db.users.Where(x =>
                  (x.UserId == Id)).Select(x => x);
                 if (_user.Count() == 0)
                 {
-                    response.StatusCode = 400;
-                    response.Message = "User Not Found";
-                    response.IsSuccess = false;
-                    return response;
+                    return new ResponseModel(404, "User NotFound", false);
                 }
+
                 byte[] salt = Encoding.ASCII.GetBytes(configuration.GetSection("Password:salt").Value!);
                 //Generating password hash and saving it
                 _user.First().password = CreatePasswordHash(cred.newPassword, salt);
                 _db.SaveChanges();
+                //Blacklisting token
                 tokenService.BlackListToken(token);
-                var authToken = tokenService.CreateToken(_user.First().email, id,2);
-                response.Message = "password Changed";
-                DataOut.Token = authToken;
-                DataOut.Name = _user.First().firstName;
-                DataOut.Email = _user.First().email;
-                DataOut.UserID = _user.First().UserId;
-                DataOut.profilePicPath = _user.First().ProfileImagePath;
-                response.Data = DataOut;
-                return response;
+
+                return new ResponseModel("Password Changed");
             }
             catch (Exception ex)
             {
-                response.StatusCode = 500;
-                response.Message = ex.Message;
-                response.IsSuccess = false;
-                return response;
+                return new ResponseModel(500, ex.Message, false);
             }
         }
     }
