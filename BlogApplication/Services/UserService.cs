@@ -191,5 +191,6 @@ namespace BlogApplication.Services
                 return new ResponseModel(500, ex.Message, false);
             }
         }
+        // ------------- A function to block user----------->>
     }
 }
