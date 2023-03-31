@@ -11,5 +11,7 @@ namespace BlogApplication.Services
         public ResponseModel GetMyBlogs(string id);
         public ResponseModel GetFamousTags();
         public ResponseModel RecommendedBlogs();
+        public ResponseModel UnblockBlog(Guid blogId);
+        public ResponseModel BlockBlog(Guid blogId);
     }
 }

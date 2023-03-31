@@ -34,12 +34,14 @@ namespace BlogApplication.Controllers
             return StatusCode(response.statusCode, response);
         }
         [HttpPut]
+        [Authorize]
         public IActionResult UpdateBlog(Guid id, [FromBody] UpdateBlogModel blog)
         {
             var response = blogService.updateBlog(id,blog);
             return StatusCode(response.statusCode, response);
         }
         [HttpDelete]
+        [Authorize]
         public IActionResult DeteteBlog(Guid id)
         {
             var response = blogService.DeleteBlog(id);
@@ -75,6 +77,22 @@ namespace BlogApplication.Controllers
         public IActionResult userBlog(Guid id)
         {
             var response = blogService.GetMyBlogs(id.ToString()!);
+            return StatusCode(response.statusCode, response);
+        }
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [Route("unblockBlog")]
+        public IActionResult UnBlockBlog(Guid Id)
+        {
+            var response = blogService.UnblockBlog(Id);
+            return StatusCode(response.statusCode, response);
+        }
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [Route("unblockBlog")]
+        public IActionResult BlockBlog(Guid Id)
+        {
+            var response = blogService.BlockBlog(Id);
             return StatusCode(response.statusCode, response);
         }
     }

@@ -15,6 +15,7 @@ namespace BlogApplication.Models
         public int likes { get; set; } = 0;
         public int dislikes { get; set; } = 0;
         public int views { get; set; } = 0;
+        public bool isBlocked { get; set; } = false;
         public bool isDeleted { get; set; } = false;
     }
 }

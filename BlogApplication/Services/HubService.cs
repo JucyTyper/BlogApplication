@@ -21,7 +21,7 @@ namespace BlogApplication.Services
                 //Checking if previously liked of disliked blog
                 var activity = _db.LikeAndDislikes.Where(x => x.blogId == new Guid(blogId)&&x.userId == new Guid(userId)).Select(x => x);
                 //Getting blog Data
-                var blog = _db.Blogs.Where(x => x.blogId == new Guid(blogId)&& x.isDeleted == false).Select(x=>x);
+                var blog = _db.Blogs.Where(x => x.blogId == new Guid(blogId)&& x.isDeleted == false && x.isBlocked == false).Select(x=>x);
                 //checking if Blog exist
                 if (blog.Count() == 0 )
                 {
@@ -149,7 +149,7 @@ namespace BlogApplication.Services
             try
             {
                 //Fetching notices
-                var Notices = _db.notices.Where(x => x.CreationTime.AddDays(1) > DateTime.Now  && x.isDeleted == false).Select(x => x).ToList();
+                var Notices = _db.notices.Where(x => x.CreationTime.AddDays(1) > DateTime.Now  && x.isDeleted == false).Select(x => x).OrderByDescending(x=>x.CreationTime).ToList();
                 //Checking if notices exist
                 if (Notices.Count() == 0)
                 {

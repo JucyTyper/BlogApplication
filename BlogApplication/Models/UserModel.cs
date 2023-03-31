@@ -16,6 +16,7 @@ namespace BlogApplication.Models
         public DateTime updated { get; set; } = DateTime.Now;
         public DateTime lastActive { get; set; } = DateTime.Now;
         public bool isDeleted { get; set; } = false;
+        public bool isBlocked { get; set; } = false;
         public bool isAdmin { get; set; } = false;
         public string ProfileImagePath { get; set; } = string.Empty;
     }

@@ -64,5 +64,21 @@ namespace BlogApplication.Controllers
             var response = userService.GetNotice();
             return StatusCode(response.statusCode, response);
         }
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [Route("blockUser")]
+        public IActionResult BlockUser(Guid Id)
+        {
+            var response = userService.BlockUser(Id);
+            return StatusCode(response.statusCode, response);
+        }
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [Route("unblockUser")]
+        public IActionResult UnBlockUser(Guid Id)
+        {
+            var response = userService.UnblockUser(Id);
+            return StatusCode(response.statusCode, response);
+        }
     }
 }

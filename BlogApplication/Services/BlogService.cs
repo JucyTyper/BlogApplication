@@ -18,6 +18,11 @@ namespace BlogApplication.Services
         {
             try
             {
+                var user = _db.users.Where(x => x.UserId == new Guid(id)).ToList();
+                if(user.Count == 0 ||user!.First().isBlocked == true)
+                {
+                    return new ResponseModel(404,"user is either blocked or not exist",false);
+                }
                 //creating a blog bodel and populating it 
                 var _blog = new BlogModel
                 {
@@ -86,7 +91,7 @@ namespace BlogApplication.Services
                         foreach (var bid in tags)
                         {
                             //fetching blogs
-                            var tagblog = _db.Blogs.Where(x => x.blogId == bid).Select(x => x).First();
+                            var tagblog = _db.Blogs.Where(x => x.blogId == bid && x.isDeleted == false && x.isBlocked == false).Select(x => x).First();
                             //Fetching All tags
                             var blogTag = _db.blogTagMaps.Where(x => x.blogId == bid && x.isDeleted == false).Select(x => x.tagId).ToList();
                             List<string> tagNames = new List<string>();
@@ -109,7 +114,7 @@ namespace BlogApplication.Services
                     }
                 }
                 // Getting Blogs based on name and id and email
-                var titleBlog = _db.Blogs.Where(x => (x.blogId == id || id == Guid.Empty) && (x.isDeleted == false) && ((EF.Functions.Like(x.title, "%" + searchString + "%") || searchString == string.Empty))).Select(x => x).OrderByDescending(x => x.createdAt).ToList();
+                var titleBlog = _db.Blogs.Where(x => (x.blogId == id || id == Guid.Empty) && (x.isDeleted == false) && x.isBlocked == false && ((EF.Functions.Like(x.title, "%" + searchString + "%") || searchString == string.Empty))).Select(x => x).OrderByDescending(x => x.createdAt).ToList();
                 foreach (var blog in titleBlog)
                 {
                     //Getting all tag maps
@@ -140,7 +145,7 @@ namespace BlogApplication.Services
             }
             catch (Exception ex)
             {
-                return new ResponseModel(500, ex.StackTrace, false);
+                return new ResponseModel(500, ex.Message, false);
             }
         }
         //------------------- A Function To Update Blogs ---------------->>
@@ -149,7 +154,7 @@ namespace BlogApplication.Services
             try
             {
                 // Getting blog to update
-                var _blog = _db.Blogs.Where(x=>x.blogId == id ).FirstOrDefault();
+                var _blog = _db.Blogs.Where(x=>x.blogId == id && x.isDeleted == false && x.isBlocked == false ).FirstOrDefault();
                 //Updating title
                 if (blog.title != string.Empty)
                     _blog!.title = blog.title;
@@ -233,7 +238,7 @@ namespace BlogApplication.Services
             try
             {
                 // Getting Blog
-                var _blog = _db.Blogs.Where(x => x.blogId == id && x.isDeleted==false).ToList();
+                var _blog = _db.Blogs.Where(x => x.blogId == id && x.isDeleted==false ).ToList();
                 // Checking if blog exist
                 if(_blog.Count == 0)
                 {
@@ -264,7 +269,7 @@ namespace BlogApplication.Services
                 var id = new Guid(Id);
                 var resdata = new List<GetBlogModel>();
                 //Fething blogs
-                var _blog = _db.Blogs.Where(x => x.createrId == id && x.isDeleted == false).Select(x=>x).ToList();
+                var _blog = _db.Blogs.Where(x => x.createrId == id && x.isDeleted == false ).Select(x=>x).ToList();
                 // Geting user Data
                 var creator = _db.users.Where(x => x.UserId == id).Select(x => x).First();
                 //for each blog getting tags
@@ -322,8 +327,54 @@ namespace BlogApplication.Services
             try
             {
                 // getting blogs
-                var tagByBlog = _db.Blogs.Where(x=>x.isDeleted == false).OrderBy(n => Guid.NewGuid()).Take(5);
+                var tagByBlog = _db.Blogs.Where(x=>x.isDeleted == false && x.isBlocked == false).OrderBy(n => Guid.NewGuid()).Take(5);
                 return new ResponseModel("Recommended blogs", tagByBlog);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel(500, ex.Message, false);
+            }
+        }
+        // ------------- A function to block blog----------->>
+        public ResponseModel BlockBlog(Guid blogId)
+        {
+            try
+            {
+                // Fetching user
+                var Blogs = _db.Blogs.Where(x => x.blogId == blogId && x.isDeleted == false && x.isBlocked == false).Select(x => x).ToList();
+                // Checking if blog exist
+                if (Blogs.Count() == 0)
+                {
+                    return new ResponseModel(404, "Blog Not found", false);
+                }
+                //Blocking blog
+                Blogs.First().isBlocked = true;
+                _db.SaveChanges();
+                // Returning response
+                return new ResponseModel("User Blocked");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel(500, ex.Message, false);
+            }
+        }
+        // ------------- A function to Unblock blog ----------->>
+        public ResponseModel UnblockBlog(Guid blogId)
+        {
+            try
+            {
+                // Fetching blog
+                var Blogs = _db.Blogs.Where(x => x.blogId == blogId && x.isDeleted == false && x.isBlocked == true).Select(x => x).ToList();
+                // Checking if blog exist
+                if (Blogs.Count() == 0)
+                {
+                    return new ResponseModel(404, "Blocked blog Not found", false);
+                }
+                //unblocking
+                Blogs.First().isBlocked = false;
+                _db.SaveChanges();
+                // Returning response
+                return new ResponseModel("User Unblocked");
             }
             catch (Exception ex)
             {
