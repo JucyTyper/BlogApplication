@@ -4,7 +4,7 @@ namespace BlogApplication.Services
 {
     public interface IHubService
     {
-        public ResponseModel likeAndDistlike(string Id, int type);
         public ResponseModel GetNotice();
+        public ResponseModel likeAndDistlike(string blogId, string userId, int type);
     }
 }

@@ -148,30 +148,21 @@ namespace BlogApplication.Services
                 return new ResponseModel(500, ex.Message, false);
             }
         }
-        public ResponseModel AddNotice(string notice)
-        {
-            try
-            {
-                var Notice = new NoticeModel(notice);
-                _db.notices.Add(Notice);
-                _db.SaveChanges();
-                return new ResponseModel("Notice Send Successfully",Notice);
-            }
-            catch(Exception ex)
-            {
-                return new ResponseModel(500, ex.Message, false);
-            }
-        }
+        // ------------------ A Function To Remove Notice ------------>>
         public ResponseModel RemoveNotice(Guid Id)
         {
             try
             {
+                //Feting Notice
                 var Notice = _db.notices.Where(x => x.noticeId == Id && x.isDeleted == false).Select(x => x);
+                //Checking if notice exist
                 if(Notice.Count() == 0)
                 {
                     return new ResponseModel(404,"Notice Not found",false);
                 }
+                //Removing Notice
                 Notice.First().isDeleted = true;
+                // Saving Changes
                 _db.SaveChanges();
                 return new ResponseModel("Notice Deleted Successfully");
             }
@@ -180,15 +171,19 @@ namespace BlogApplication.Services
                 return new ResponseModel(500, ex.Message, false);
             }
         }
+        // ------------ A Function to Get Notice ------------>>
         public ResponseModel GetNotice()
         {
             try
             {
+                // Fetching All Notice
                 var Notices = _db.notices.Where(x => x.isDeleted == false).Select(x => x).ToList();
+                // Checking if notice exist
                 if (Notices.Count() == 0)
                 {
                     return new ResponseModel(404, "Notice Not found", false);
                 }
+                // Returning response
                 return new ResponseModel("All Notices", Notices);
             }
             catch (Exception ex)

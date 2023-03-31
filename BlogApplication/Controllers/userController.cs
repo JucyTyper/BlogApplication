@@ -36,7 +36,6 @@ namespace BlogApplication.Controllers
             return StatusCode(response.statusCode, response);
         }
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public IActionResult GetUser(Guid id,string? email,string? name,int pageNo)
         {
             var response = userService.GetUser(id,name!,email!,pageNo);
@@ -48,14 +47,7 @@ namespace BlogApplication.Controllers
             var response = userService.UpdateUser(id, user);
             return StatusCode(response.statusCode, response);
         }
-        [HttpPost]
-        [Authorize(Roles = "Admin")]
-        [Route("addNotice")]
-        public IActionResult addNotice(AddNotice Data)
-        {
-            var response = userService.AddNotice(Data.noticeData);
-            return StatusCode(response.statusCode, response);
-        }
+
         [HttpDelete]
         [Authorize(Roles = "Admin")]
         [Route("removeNotice")]
