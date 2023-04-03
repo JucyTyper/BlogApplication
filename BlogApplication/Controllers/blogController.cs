@@ -79,20 +79,12 @@ namespace BlogApplication.Controllers
             var response = blogService.GetMyBlogs(id.ToString()!);
             return StatusCode(response.statusCode, response);
         }
-        [HttpPost]
+        [HttpDelete]
         [Authorize(Roles = "Admin")]
-        [Route("unblockBlog")]
-        public IActionResult UnBlockBlog(Guid Id)
+        [Route("blockBlog")]
+        public IActionResult BlockBlog(Guid id,int type)
         {
-            var response = blogService.UnblockBlog(Id);
-            return StatusCode(response.statusCode, response);
-        }
-        [HttpPost]
-        [Authorize(Roles = "Admin")]
-        [Route("unblockBlog")]
-        public IActionResult BlockBlog(Guid Id)
-        {
-            var response = blogService.BlockBlog(Id);
+            var response = blogService.BlockBlog(id,type);
             return StatusCode(response.statusCode, response);
         }
     }

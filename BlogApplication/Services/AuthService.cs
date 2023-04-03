@@ -57,6 +57,7 @@ namespace BlogApplication.Services
                     DataOut.Name = _user.First().firstName;
                     DataOut.Email = _user.First().email;
                     DataOut.UserID = _user.First().UserId;
+                    DataOut.isAdmin = _user.First().isAdmin;
                     return new ResponseModel(DataOut);
                 }
                 // For normal user
@@ -65,7 +66,8 @@ namespace BlogApplication.Services
                 DataOut.Name = _user.First().firstName;
                 DataOut.Email = _user.First().email;
                 DataOut.UserID = _user.First().UserId;
-                DataOut.isAdmin = _user.First().isAdmin;
+                DataOut.isAdmin = _user.First().isAdmin; 
+                DataOut.isBlocked = _user.First().isBlocked;
                 return new ResponseModel( DataOut);
             }
             catch(Exception ex)
@@ -124,7 +126,7 @@ namespace BlogApplication.Services
                 return new ResponseModel(500, ex.Message, false);
             }
         }
-        //---------------------- A Function To LogOut User ------------------->>
+        //------------------ A Function To LogOut User ------------------->>
         public ResponseModel logout(string token)
         {
             try

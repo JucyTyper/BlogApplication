@@ -77,6 +77,7 @@ namespace BlogApplication.Services
                 DataOut.Email = userModel.email;
                 DataOut.UserID = userModel.UserId;
                 DataOut.isAdmin= userModel.isAdmin;
+                DataOut.isBlocked = userModel.isBlocked ;
                 DataOut.profilePicPath = userModel.ProfileImagePath;
                 
                 return new ResponseModel(200, "User added Successfully", DataOut, true);
@@ -192,7 +193,7 @@ namespace BlogApplication.Services
             }
         }
         // ------------- A function to block user----------->>
-        public ResponseModel BlockUser(Guid userId)
+        public ResponseModel BlockUser(Guid userId, int type)
         {
             try
             {
@@ -203,46 +204,42 @@ namespace BlogApplication.Services
                 {
                     return new ResponseModel(404, "user Not found", false);
                 }
-                //Blocking User
-                user.First().isBlocked = true;
-                //Blocking All blogs of the user
-                var Blogs = _db.Blogs.Where(x=>x.createrId == userId).Select(x=>x).ToList();
-                foreach(var blog in Blogs)
+                if(type == 1) 
                 {
-                    blog.isBlocked = true;
+                    if (user.First().isBlocked == true)
+                    {
+                        return new ResponseModel("user already Blocked");
+                    }
+                    //Blocking User
+                    user.First().isBlocked = true;
+                    //Blocking All blogs of the user
+                    var Blogs = _db.Blogs.Where(x => x.createrId == userId).Select(x => x).ToList();
+                    foreach (var blog in Blogs)
+                    {
+                        blog.isBlocked = true;
+                    }
+                    _db.SaveChanges();
+                    // Returning response
+                    return new ResponseModel("User Blocked");
                 }
-                _db.SaveChanges();
-                // Returning response
-                return new ResponseModel("User Blocked");
-            }
-            catch (Exception ex)
-            {
-                return new ResponseModel(500, ex.Message, false);
-            }
-        }
-        // ------------- A function to Unblock user----------->>
-        public ResponseModel UnblockUser(Guid userId)
-        {
-            try
-            {
-                // Fetching user
-                var user = _db.users.Where(x => x.UserId == userId && x.isBlocked == true && x.isDeleted == false).Select(x => x).ToList();
-                // Checking if user exist
-                if (user.Count() == 0)
+                else
                 {
-                    return new ResponseModel(404, "Blocked user Not found", false);
+                    if (user.First().isBlocked == false)
+                    {
+                        return new ResponseModel("user already Unblocked");
+                    }
+                    //ubBlocking User
+                    user.First().isBlocked = false;
+                    //unBlocking All blogs of the user
+                    var Blogs = _db.Blogs.Where(x => x.createrId == userId && x.isDeleted == false).Select(x => x).ToList();
+                    foreach (var blog in Blogs)
+                    {
+                        blog.isBlocked = false;
+                    }
+                    _db.SaveChanges();
+                    // Returning response
+                    return new ResponseModel("User Unblocked");
                 }
-                //Blocking User
-                user.First().isBlocked = false;
-                //Blocking All blogs of the user
-                var Blogs = _db.Blogs.Where(x => x.createrId == userId && x.isDeleted == false).Select(x => x).ToList();
-                foreach (var blog in Blogs)
-                {
-                    blog.isBlocked = false;
-                }
-                _db.SaveChanges();
-                // Returning response
-                return new ResponseModel("User Unblocked");
             }
             catch (Exception ex)
             {

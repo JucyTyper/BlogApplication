@@ -115,6 +115,10 @@ namespace BlogApplication.Services
                 }
                 // Getting Blogs based on name and id and email
                 var titleBlog = _db.Blogs.Where(x => (x.blogId == id || id == Guid.Empty) && (x.isDeleted == false) && x.isBlocked == false && ((EF.Functions.Like(x.title, "%" + searchString + "%") || searchString == string.Empty))).Select(x => x).OrderByDescending(x => x.createdAt).ToList();
+                if (titleBlog.Count == 0)
+                {
+                    return new ResponseModel(404, "Blog Not Found", false);
+                }
                 foreach (var blog in titleBlog)
                 {
                     //Getting all tag maps
@@ -336,45 +340,48 @@ namespace BlogApplication.Services
             }
         }
         // ------------- A function to block blog----------->>
-        public ResponseModel BlockBlog(Guid blogId)
+        public ResponseModel BlockBlog(Guid blogId,int type)
         {
             try
             {
                 // Fetching user
-                var Blogs = _db.Blogs.Where(x => x.blogId == blogId && x.isDeleted == false && x.isBlocked == false).Select(x => x).ToList();
+                var Blogs = _db.Blogs.Where(x => x.blogId == blogId && x.isDeleted == false ).Select(x => x).ToList();
                 // Checking if blog exist
                 if (Blogs.Count() == 0)
                 {
                     return new ResponseModel(404, "Blog Not found", false);
                 }
-                //Blocking blog
-                Blogs.First().isBlocked = true;
-                _db.SaveChanges();
-                // Returning response
-                return new ResponseModel("User Blocked");
-            }
-            catch (Exception ex)
-            {
-                return new ResponseModel(500, ex.Message, false);
-            }
-        }
-        // ------------- A function to Unblock blog ----------->>
-        public ResponseModel UnblockBlog(Guid blogId)
-        {
-            try
-            {
-                // Fetching blog
-                var Blogs = _db.Blogs.Where(x => x.blogId == blogId && x.isDeleted == false && x.isBlocked == true).Select(x => x).ToList();
-                // Checking if blog exist
-                if (Blogs.Count() == 0)
+                if (type == 1)
                 {
-                    return new ResponseModel(404, "Blocked blog Not found", false);
+                    if (Blogs.First().isBlocked == true)
+                    {
+                        return new ResponseModel("blog already Blocked");
+                    }
+                    //Blocking blog
+                    Blogs.First().isBlocked = true;
+                    _db.SaveChanges();
+                    // Returning response
+                    return new ResponseModel("blog Blocked");
                 }
-                //unblocking
-                Blogs.First().isBlocked = false;
-                _db.SaveChanges();
-                // Returning response
-                return new ResponseModel("User Unblocked");
+                else
+                {
+                    var user = _db.users.Where(x => x.UserId == Blogs.First().createrId && x.isDeleted == false && x.isBlocked == false ).Select(x => x).ToList();
+                    //Checking if user is blocked
+                    if (user.Count() == 0)
+                    {
+                        return new ResponseModel("Blog creater is blocked");
+                    }
+                    //checking if user in already uncblocked
+                    if (Blogs.First().isBlocked == false)
+                    {
+                        return new ResponseModel("blog already unblocked");
+                    }
+                    //Blocking blog
+                    Blogs.First().isBlocked = false;
+                    _db.SaveChanges();
+                    // Returning response
+                    return new ResponseModel("blog Blocked");
+                }
             }
             catch (Exception ex)
             {

@@ -64,20 +64,12 @@ namespace BlogApplication.Controllers
             var response = userService.GetNotice();
             return StatusCode(response.statusCode, response);
         }
-        [HttpPost]
+        [HttpDelete]
         [Authorize(Roles = "Admin")]
         [Route("blockUser")]
-        public IActionResult BlockUser(Guid Id)
+        public IActionResult BlockUser(Guid id,int type)
         {
-            var response = userService.BlockUser(Id);
-            return StatusCode(response.statusCode, response);
-        }
-        [HttpPost]
-        [Authorize(Roles = "Admin")]
-        [Route("unblockUser")]
-        public IActionResult UnBlockUser(Guid Id)
-        {
-            var response = userService.UnblockUser(Id);
+            var response = userService.BlockUser(id,type);
             return StatusCode(response.statusCode, response);
         }
     }

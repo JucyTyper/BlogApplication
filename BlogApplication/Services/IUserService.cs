@@ -10,7 +10,6 @@ namespace BlogApplication.Services
         public ResponseModel UpdateUser(Guid id, UpdateUserModel user);
         public ResponseModel RemoveNotice(Guid Id);
         public ResponseModel GetNotice();
-        public ResponseModel UnblockUser(Guid userId);
-        public ResponseModel BlockUser(Guid userId);
+        public ResponseModel BlockUser(Guid userId, int type);
     }
 }
